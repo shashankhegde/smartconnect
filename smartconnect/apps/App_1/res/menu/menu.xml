@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/reload" android:title="Page Reload"
+		android:icon="@android:drawable/ic_menu_edit" android:titleCondensed="rl"
+		android:menuCategory="alternative">
+	</item>
+</menu>
