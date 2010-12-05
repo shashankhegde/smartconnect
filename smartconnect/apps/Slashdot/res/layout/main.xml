@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" android:text="Slashdot RSS reader" android:layout_gravity="center" android:gravity="center" android:textSize="24dp"/>
+
+
+<ScrollView android:id="@+id/svUpdates"
+android:layout_width="fill_parent"
+android:layout_height="300px">
+<TextView android:id="@+id/tvUpdates" android:text="Updates..." android:layout_marginTop="20dp" android:scrollbars="vertical" android:scrollbarSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:inputType="textMultiLine"></TextView>
+</ScrollView>
+
+</LinearLayout>
