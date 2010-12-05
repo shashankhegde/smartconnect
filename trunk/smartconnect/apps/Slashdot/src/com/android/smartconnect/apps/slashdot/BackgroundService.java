@@ -3,6 +3,7 @@ package com.android.smartconnect.apps.slashdot;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -34,14 +35,22 @@ public class BackgroundService extends Service {
 			// TODO Auto-generated method stub
 			iUpdateInterval = aIntervalInSecs;
 			if(iUpdateChecker == null) {
-				iUpdateChecker = new UpdateChecker();
+				URL url = null;
+				try {
+					url = new URL(aUrl);
+					iUpdateChecker = new UpdateChecker(url);
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 			if(iUpdateThreadHandler == null) {
 				iUpdateThreadHandler = new Handler();
 			}
 			
-			iUpdateThreadHandler.postDelayed(iUpdateChecker, iUpdateInterval*1000);
+			iUpdateChecker.StartContinuousUpdate();
+			iUpdateThreadHandler.postDelayed(iUpdateChecker, 1);
 			return 0;
 		}
 
@@ -61,11 +70,15 @@ public class BackgroundService extends Service {
 		private URLConnection iUrlConnection = null;
 		private boolean iUpdateContinuously = false;
 		
-		public void StartUpdate() {
+		public UpdateChecker(URL aUrl) {
+			iUrl = aUrl;
+		}
+
+		public void StartContinuousUpdate() {
 			iUpdateContinuously = true;
 		}
 		
-		public void StopUpdate() {
+		public void StopContinuousUpdate() {
 			iUpdateContinuously = false;
 		}
 		
@@ -108,21 +121,22 @@ public class BackgroundService extends Service {
 				e.printStackTrace();
 			}
 			
+			String response = "";
 			if(reader != null) {
 				String line = "";
-				String response = "";
 				try {
 					while((line = reader.readLine()) != null) {
-						Log.i(getPackageName()+":"+getClass().getName(), line);
+						//Log.i(getPackageName()+":"+getClass().getName(), line);
 						response += line;
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				return response;
 			}
-			return null;
+			
+			iUrlConnection = null;
+			return response;
 		}
 		
 	}

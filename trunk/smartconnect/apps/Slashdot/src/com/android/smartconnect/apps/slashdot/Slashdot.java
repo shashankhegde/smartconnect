@@ -21,7 +21,7 @@ public class Slashdot extends Activity {
 
         String data = "";
         if(iRequestHandler == null ) {
-	        iRequestHandler = new RequestHandler(this,"http://rss.slashdot.org/Slashdot/slashdot",1*60);
+	        iRequestHandler = new RequestHandler(this,"http://rss.slashdot.org/Slashdot/slashdot",30);
 	        iRequestHandler.StartUpdateCheck();
         }
         
