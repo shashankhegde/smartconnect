@@ -36,6 +36,22 @@ public class RequestHandler {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
+		if(!iServiceStarted) {
+			int err = StartService();
+			if(err == -1)
+				return;
+			
+			assert(iServiceStarted);
+		}
+		
+		if(!iServiceBound) {
+			int err = DoBindService();
+			if(err == -1)
+				return;
+			
+			assert(iServiceBound);
+		}
+		
 	}
 	
 	public void StartUpdateCheck() {
@@ -101,6 +117,9 @@ public class RequestHandler {
 	}
 	
 	private void StartUpdate() {
+		if(iBackgroundService == null) {
+			return;
+		}
 		try {
 			iBackgroundService.CheckUpdate(iUrl.toString(), iIntervalInSecs );
 		} catch (RemoteException e) {
