@@ -57,6 +57,10 @@ public class RequestHandler {
 	public void StartUpdateCheck() {
 		StartUpdate();
 	}
+	
+	public void Cleanup() {
+		UnbindService();
+	}
 
 	protected int StartService() {
 		iServiceIntent = new Intent();
