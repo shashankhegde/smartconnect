@@ -108,6 +108,18 @@
 			</TableRow>
 		</TableLayout>
 		<TableLayout>
+			<TextView android:id="@+id/sayHello" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="@string/hello" />
+			<TextView android:id="@+id/sayHelloByName"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:text="@string/hello" />
+			<TextView android:id="@+id/callBack" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Waiting for service msg" />
+			<Button android:id="@+id/stop" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:text="stop Activity">
+			</Button>
+		</TableLayout>
+		<TableLayout>
 			<TableRow>
 				<Button android:text="Start!" android:id="@+id/ButtonSubmit"
 					android:layout_gravity="center" android:layout_width="wrap_content"

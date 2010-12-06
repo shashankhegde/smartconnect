@@ -8,12 +8,22 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import com.android.perf.service.IRemoteService;
+import com.android.perf.service.IRemoteServiceCallback;
+import com.android.perf.service.RemoteInterface;
+
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -56,10 +66,78 @@ public class Main extends Activity implements OnClickListener {
 	static final int DATE_DIALOG_ID = 0;
 	static final int TIME_DIALOG_ID = 1;
 	
+	/** RemoteProxy*/
+	static RemoteInterface mRemoteInterfaceService = null;
+	private IRemoteService mService = null;
+	private Handler mHandler = null;
+	
+	
+	static TextView tv01=null;
+	static TextView tv02=null;
+	static TextView callBack=null;
+	
+	Button stop = null;
+	
+	boolean mlsBound = false;
+	
+	// call 'the Remote Method'
+	// use mRemoteInterfaceService obj to call methods of RemoteStub
+	// Must be implemented
+	
+	// Service Component
+	private IRemoteServiceCallback mCallback = new IRemoteServiceCallback.Stub(){
+		public void MessageCallback(int msg){
+			mHandler.sendEmptyMessage(msg);
+		}
+	};
+	
+	private ServiceConnection mSecondaryConnection = new ServiceConnection(){
+		
+		public void onServiceConnected(ComponentName name, IBinder service){
+			mRemoteInterfaceService = RemoteInterface.Stub.asInterface(service);
+			
+			if(mRemoteInterfaceService != null){
+				printHello();
+				Log.d("RemoteProxy", "ServiceConnection-mRemoteInterfaceService is not null");
+			}else{
+				Log.d("RemoteProxy", "ServiceConnection-mRemoteInterfaceService is null");
+			}
+		}
+		
+		public void onServiceDisconnected(ComponentName name){
+			mRemoteInterfaceService = null;
+		}
+	};
+	/**RemoteProxy end*/
+	
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mainpage);
+		
+		
+		/** RemoteProxy */
+		tv01 = (TextView) this.findViewById(R.id.sayHello);
+		tv02 = (TextView) this.findViewById(R.id.sayHelloByName);
+		callBack = (TextView) this.findViewById(R.id.callBack);
+
+		stop = (Button) this.findViewById(R.id.stop);
+
+		stop.setOnClickListener(new Button.OnClickListener() {
+			public void onClick(View v) {
+
+				stopBindService();
+			}
+		});
+
+		// Call the access of Remote Method
+		ComponentName cn = this.startService(new Intent(
+				"com.remoteStub.RemoteInterface"));
+//		Log.d("RemoteProxy", "Start IRemoteService service : " + cn.toString()); // TODO (NullPointerEX)
+
+		// request Bind to communicate constantly
+		startBindService();
+		/** RemoteProxy End */
 
 		// put values to EditText
 
@@ -108,6 +186,54 @@ public class Main extends Activity implements OnClickListener {
 		Log.d(TAG, "onCreate done");
 			
 	}
+	
+	/** RemoteProxy */
+	
+	public static void printHello() {
+
+		String sayHello = "";
+		String sayHelloByName = "";
+
+		// call Remode Method
+		try {
+			sayHello = mRemoteInterfaceService.getSayHello();
+			sayHelloByName = mRemoteInterfaceService.getSayHelloByName("Jay");
+
+			callBack.setText("exec printHello");
+
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		tv01.setText(sayHello);
+		tv02.setText(sayHelloByName);
+    }
+    
+	private void startBindService(){
+		
+		boolean bindFlag02 = bindService(new Intent("com.remoteStub.RemoteInterface"), mSecondaryConnection, Context.BIND_AUTO_CREATE);
+		Log.d("RemoteProxy", "RemoteInterface-bind : "+String.valueOf(bindFlag02));
+		
+		callBack.setText("Binding..");
+		mlsBound = true;
+	}
+	
+	// Disconnect Connection
+	private void stopBindService(){
+		if(mlsBound){
+			if (mService != null){
+//			if (mRemoteInterfaceService != null){
+				try{
+					mService.unregisterCallback(mCallback);
+				}catch(RemoteException e){
+					// Nothing to do if the service has crashed
+				}
+			}
+			unbindService(mSecondaryConnection);
+		}
+		callBack.setText("Unbinding...");
+	}
+	
+	/** RemoteProxy End */
 	
 	// Creating Dialog
 	@Override
