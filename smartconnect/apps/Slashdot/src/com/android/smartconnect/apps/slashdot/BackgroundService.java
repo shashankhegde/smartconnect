@@ -22,6 +22,8 @@ public class BackgroundService extends Service {
 	UpdateChecker iUpdateChecker = null;
 	Handler iUpdateThreadHandler = null;
 	
+	LogHelper iLogger = null;
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
@@ -52,6 +54,7 @@ public class BackgroundService extends Service {
 			iUpdateChecker.StartContinuousUpdate();
 			iUpdateThreadHandler.removeCallbacks(iUpdateChecker);
 			iUpdateThreadHandler.postDelayed(iUpdateChecker, 1);
+			
 			return 0;
 		}
 
@@ -98,7 +101,13 @@ public class BackgroundService extends Service {
 		@Override
 		public void run() {
 			
+			if(iLogger == null) {
+				iLogger = new LogHelper("slashdor.org");
+			}
+			iLogger.addLog("SEND");
 			String data = GetData();
+			iLogger.addLog("RECV | " + data.length());
+			
 			if (iCallback != null) {
 				try {
 					iCallback.onUpdateReceived(data);
