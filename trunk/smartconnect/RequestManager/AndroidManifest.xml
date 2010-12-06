@@ -12,6 +12,9 @@
             </intent-filter>
         </activity>
 
+    <service android:name=".RequestManagerService" android:exported="true" android:enabled="true">
+    </service>
+
     </application>
 
 
