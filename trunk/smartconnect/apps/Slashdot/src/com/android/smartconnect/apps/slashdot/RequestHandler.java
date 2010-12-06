@@ -27,6 +27,8 @@ public class RequestHandler {
 	private UpdateServiceConnection iUpdateServiceConnection = null;
 	private int iIntervalInSecs = 5*60; // 5 min
 	
+	boolean iUpdatePending = false;
+	
 	RequestHandler(Activity aParentActivity, String aUrl, int aUpdateInterval) {
 		iParentActivity = aParentActivity;
 		iIntervalInSecs = aUpdateInterval;
@@ -60,6 +62,19 @@ public class RequestHandler {
 	
 	public void Cleanup() {
 		UnbindService();
+	}
+	
+	public void SetUpdateInterval(int aInterval) {
+		iIntervalInSecs = aInterval;
+		
+		if(iBackgroundService != null) {
+			try {
+				iBackgroundService.SetUpdateInterval(aInterval);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	protected int StartService() {
@@ -109,7 +124,10 @@ public class RequestHandler {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			iBackgroundService = IBackgroundService.Stub.asInterface(service);
-			StartUpdate();
+			if(iUpdatePending) {
+				StartUpdate();
+				iUpdatePending = false;
+			}
 		}
 
 		@Override
@@ -122,6 +140,7 @@ public class RequestHandler {
 	
 	private void StartUpdate() {
 		if(iBackgroundService == null) {
+			iUpdatePending = true;
 			return;
 		}
 		try {

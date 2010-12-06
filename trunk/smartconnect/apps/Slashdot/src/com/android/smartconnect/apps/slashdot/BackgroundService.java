@@ -50,6 +50,7 @@ public class BackgroundService extends Service {
 			}
 			
 			iUpdateChecker.StartContinuousUpdate();
+			iUpdateThreadHandler.removeCallbacks(iUpdateChecker);
 			iUpdateThreadHandler.postDelayed(iUpdateChecker, 1);
 			return 0;
 		}
@@ -60,6 +61,18 @@ public class BackgroundService extends Service {
 				throws RemoteException {
 			// TODO Auto-generated method stub
 			iCallback = aBackgroundServiceCallback;
+			return 0;
+		}
+
+		@Override
+		public int SetUpdateInterval(int aIntervalInSecs)
+				throws RemoteException {
+			iUpdateInterval = aIntervalInSecs;
+			Log.i("BackgroundService","Setting Update Interval to: " + String.valueOf(iUpdateInterval));
+			if(iUpdateThreadHandler != null && iUpdateChecker != null) {
+				iUpdateThreadHandler.removeCallbacks(iUpdateChecker);
+				iUpdateThreadHandler.postDelayed(iUpdateChecker, iUpdateInterval);
+			}
 			return 0;
 		}
 	};
@@ -96,6 +109,7 @@ public class BackgroundService extends Service {
 			}
 			
 			if(iUpdateContinuously) {
+				Log.i("BackgroundService","Update Interval : " + String.valueOf(iUpdateInterval));
 				iUpdateThreadHandler.postDelayed(iUpdateChecker, iUpdateInterval*1000);
 			}
 		}
