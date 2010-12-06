@@ -3,13 +3,20 @@ package com.android.smartconnect.apps.slashdot;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ScrollView;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class Slashdot extends Activity {
+public class Slashdot extends Activity implements OnTouchListener {
 	
 	TextView iUpdates = null;
 	RequestHandler iRequestHandler = null;
+	SeekBar iUpdateInterval = null;
+	Button iBtnStartUpdate = null;
 	
     /** Called when the activity is first created. */
     @Override
@@ -23,8 +30,15 @@ public class Slashdot extends Activity {
         String data = "";
         if(iRequestHandler == null ) {
 	        iRequestHandler = new RequestHandler(this,"http://rss.slashdot.org/Slashdot/slashdot",30);
-	        iRequestHandler.StartUpdateCheck();
         }
+        
+        iUpdateInterval = (SeekBar)findViewById(R.id.sbInterval);
+        iUpdateInterval.setProgress(5); // Default is 5 min
+        
+        iUpdateInterval.setOnTouchListener((OnTouchListener) this);
+        
+        iBtnStartUpdate = (Button)findViewById(R.id.btnStartUpdate);
+        iBtnStartUpdate.setOnTouchListener(this);
         
         iUpdates.setText(data);
         
@@ -35,4 +49,22 @@ public class Slashdot extends Activity {
     	iRequestHandler.Cleanup();
     	super.onDestroy();
     }
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		switch(v.getId()) {
+		case R.id.sbInterval:
+			int val = iUpdateInterval.getProgress();
+			Log.i(getClass().getName(), "Value : " + String.valueOf(val));
+			iRequestHandler.SetUpdateInterval(val*60);
+			break;
+		case R.id.btnStartUpdate:
+			val = iUpdateInterval.getProgress();
+			Log.i(getClass().getName(), "Value : " + String.valueOf(val));
+			iRequestHandler.SetUpdateInterval(val*60);
+	        iRequestHandler.StartUpdateCheck();
+			break;
+		}
+		return false;
+	}
 }

@@ -9,10 +9,15 @@
     android:layout_height="wrap_content" android:text="Slashdot RSS reader" android:layout_gravity="center" android:gravity="center" android:textSize="24dp"/>
 
 
-<ScrollView android:id="@+id/svUpdates"
+<TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Select Update Interval [0-60 min]" android:layout_margin="10sp" android:layout_gravity="center"></TextView><SeekBar android:layout_height="wrap_content" android:id="@+id/sbInterval" android:layout_width="fill_parent" android:max="60" android:layout_margin="10sp"></SeekBar><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/btnStartUpdate" android:text="Start Update" android:layout_gravity="center"></Button><ScrollView android:id="@+id/svUpdates"
 android:layout_width="fill_parent"
 android:layout_height="300px">
 <TextView android:id="@+id/tvUpdates" android:text="Updates..." android:layout_marginTop="20dp" android:scrollbars="vertical" android:scrollbarSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:inputType="textMultiLine"></TextView>
+
 </ScrollView>
+
+
+
+
 
 </LinearLayout>
