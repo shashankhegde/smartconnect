@@ -13,11 +13,13 @@ import android.widget.TabHost;
 
 public class PerfAnalyzer extends TabActivity {
 	
+
+
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
+        		
 		Resources res = getResources(); // Resource object to get Drawables
 		TabHost tabHost = getTabHost(); // The activity TabHost
 		TabHost.TabSpec spec; // Resusable TabSpec for each tab
@@ -41,6 +43,8 @@ public class PerfAnalyzer extends TabActivity {
 
 		tabHost.setCurrentTab(1);
 	}
+	
+
 	
 	private void setNotification(){
 		NotificationManager notiMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
