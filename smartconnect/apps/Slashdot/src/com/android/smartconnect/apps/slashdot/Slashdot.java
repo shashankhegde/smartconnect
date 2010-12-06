@@ -2,6 +2,7 @@ package com.android.smartconnect.apps.slashdot;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -27,5 +28,11 @@ public class Slashdot extends Activity {
         
         iUpdates.setText(data);
         
+    }
+    
+    public void onDestroy() {
+    	Log.i(getClass().getName(),"onDestroy()");
+    	iRequestHandler.Cleanup();
+    	super.onDestroy();
     }
 }
