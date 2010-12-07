@@ -7,7 +7,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -23,6 +25,7 @@ public class BackgroundService extends Service {
 	Handler iUpdateThreadHandler = null;
 	
 	LogHelper iLogger = null;
+	private Context iParentContext = null;
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -32,15 +35,16 @@ public class BackgroundService extends Service {
 	
 	private IBackgroundService.Stub iBackgroundService = new IBackgroundService.Stub() {
 		
+
 		@Override
 		public int CheckUpdate(String aUrl, int aIntervalInSecs) throws RemoteException {
-			// TODO Auto-generated method stub
+			iParentContext = getApplicationContext();
 			iUpdateInterval = aIntervalInSecs;
 			if(iUpdateChecker == null) {
 				URL url = null;
 				try {
 					url = new URL(aUrl);
-					iUpdateChecker = new UpdateChecker(url);
+					iUpdateChecker = new UpdateChecker(url,iParentContext);
 				} catch (MalformedURLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -80,14 +84,17 @@ public class BackgroundService extends Service {
 		}
 	};
 	
-	class UpdateChecker implements Runnable {
+	class UpdateChecker implements Runnable, IDataReceiver {
 
 		private URL iUrl = null;
 		private URLConnection iUrlConnection = null;
 		private boolean iUpdateContinuously = false;
+		private RequestManagerHelper iHelper = null;
+		private Context iParentContext;
 		
-		public UpdateChecker(URL aUrl) {
+		public UpdateChecker(URL aUrl, Context aParentContext) {
 			iUrl = aUrl;
+			iParentContext = aParentContext;
 		}
 
 		public void StartContinuousUpdate() {
@@ -100,6 +107,26 @@ public class BackgroundService extends Service {
 		
 		@Override
 		public void run() {
+			runRemote();
+			//runLocal();
+		}
+		
+		public void runRemote() {
+			if(iHelper == null) {
+				iHelper = new RequestManagerHelper(this.iParentContext);
+			}
+			iHelper.SendRequest(iUrl.toString(),this);
+		}
+
+		@Override
+		public void onDataReceived(String aData) {
+			if(iUpdateContinuously) {
+				Log.i("BackgroundService","onDataReceived()");
+				iUpdateThreadHandler.postDelayed(iUpdateChecker, iUpdateInterval*1000);
+			}
+		}
+		
+		public void runLocal() {
 			
 			if(iLogger == null) {
 				iLogger = new LogHelper("slashdor.org");
@@ -161,6 +188,7 @@ public class BackgroundService extends Service {
 			iUrlConnection = null;
 			return response;
 		}
+
 		
 	}
 }

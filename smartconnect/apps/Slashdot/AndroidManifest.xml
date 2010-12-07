@@ -15,6 +15,11 @@
         <service android:name=".BackgroundService" android:exported="true">
         </service>
 
+        <service android:name="com.android.smartconnect.requestmanager.RequestManagerService" 
+                 android:exported="true"
+                 android:process=":remote">
+        </service>
+
     </application>
 
 
