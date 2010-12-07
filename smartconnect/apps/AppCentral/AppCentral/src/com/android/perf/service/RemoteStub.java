@@ -1,7 +1,5 @@
 package com.android.perf.service;
 
-import com.android.perf.service.*;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,6 +11,7 @@ import android.os.Message;
 import android.os.Process;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.util.Log;
 import android.widget.Toast;
 
 public class RemoteStub extends Service {
@@ -33,10 +32,17 @@ public class RemoteStub extends Service {
 			return "Hello? " + name + ", Welcome!";
 		}
 		
-		public void registerCallback(IRemoteServiceCallback cb){
+		public boolean registerCallback(IRemoteServiceCallback cb){
+			boolean flag = false;
 			if (cb!=null){
-				mCallbacks.register(cb);
+				flag = mCallbacks.register(cb);
+				if (flag){
+					Log.d("RemoteStub", "registerCallback Succeeded");
+				}else {
+					Log.d("RemoteStub", "registerCallback Failed");
+				}
 			}
+			return flag;
 		}
 		
 		public void unregisterCallback(IRemoteServiceCallback cb){
@@ -75,9 +81,12 @@ public class RemoteStub extends Service {
                     
                     // Broadcast to all clients the new value.
                     final int N = mCallbacks.beginBroadcast();
+                    Log.d("RemoteStub", "mCallbacks.beginBroadcast : "+String.valueOf(N));
+                    
                     for (int i=0; i<N; i++) {
                         try {
                             mCallbacks.getBroadcastItem(i).valueChanged(value);
+                            Log.d("RemoteStub", "BroadcastItem : "+value);
                         } catch (RemoteException e) {
                             // The RemoteCallbackList will take care of removing
                             // the dead object for us.
@@ -105,6 +114,9 @@ public class RemoteStub extends Service {
         }
         if (ISecondary.class.getName().equals(intent.getAction())) {
             return mSecondaryBinder;
+        }
+        if (RemoteInterface.class.getName().equals(intent.getAction())) {
+            return mBinder;
         }
         return null;
 	}	
