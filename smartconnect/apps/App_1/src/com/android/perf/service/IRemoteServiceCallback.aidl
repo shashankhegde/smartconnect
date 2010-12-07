@@ -4,5 +4,5 @@ package com.android.perf.service;
  */
 oneway interface IRemoteServiceCallback {
 
-    void MessageCallback(int msg);
+    void valueChanged(int value);
 }

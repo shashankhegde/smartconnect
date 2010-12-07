@@ -35,6 +35,12 @@ public class PerfAnalyzer extends TabActivity {
 				.setContent(intent);
 		tabHost.addTab(spec);
 
+		intent = new Intent().setClass(this, RemoteServiceBinding.class);
+		spec = tabHost.newTabSpec("binding")
+				.setIndicator("BIND", res.getDrawable(R.drawable.icon))
+				.setContent(intent);
+		tabHost.addTab(spec);
+		
 		intent = new Intent().setClass(this, WebFacebook.class);
 		spec = tabHost.newTabSpec("view")
 				.setIndicator("VIEW", res.getDrawable(R.drawable.icon))
