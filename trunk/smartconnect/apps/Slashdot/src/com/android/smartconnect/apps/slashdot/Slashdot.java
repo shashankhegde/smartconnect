@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class Slashdot extends Activity implements OnTouchListener {
+public class Slashdot extends Activity implements OnTouchListener, OnClickListener {
 	
 	TextView iUpdates = null;
 	RequestHandler iRequestHandler = null;
@@ -33,12 +33,12 @@ public class Slashdot extends Activity implements OnTouchListener {
         }
         
         iUpdateInterval = (SeekBar)findViewById(R.id.sbInterval);
-        iUpdateInterval.setProgress(5); // Default is 5 min
+        iUpdateInterval.setProgress(1); // Default is 1 min
         
         iUpdateInterval.setOnTouchListener((OnTouchListener) this);
         
         iBtnStartUpdate = (Button)findViewById(R.id.btnStartUpdate);
-        iBtnStartUpdate.setOnTouchListener(this);
+        iBtnStartUpdate.setOnClickListener(this);
         
         iUpdates.setText(data);
         
@@ -58,13 +58,19 @@ public class Slashdot extends Activity implements OnTouchListener {
 			Log.i(getClass().getName(), "Value : " + String.valueOf(val));
 			iRequestHandler.SetUpdateInterval(val*60);
 			break;
+		}
+		return false;
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch(v.getId()) {
 		case R.id.btnStartUpdate:
-			val = iUpdateInterval.getProgress();
+			int val = iUpdateInterval.getProgress();
 			Log.i(getClass().getName(), "Value : " + String.valueOf(val));
 			iRequestHandler.SetUpdateInterval(val*60);
 	        iRequestHandler.StartUpdateCheck();
 			break;
 		}
-		return false;
 	}
 }
