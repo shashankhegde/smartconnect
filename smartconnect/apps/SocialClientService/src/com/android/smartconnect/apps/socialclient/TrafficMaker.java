@@ -6,18 +6,23 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.Timestamp;
+import java.util.Date;
+import java.util.Random;
 
 public class TrafficMaker implements Runnable {
 	
 	private long intervalMilliseconds;
 	private URL url;
 	private LogHelper logHelper;
+	private long iVariance = 0;
+	private Random iRandomNumberGenerator;
 	
 	public TrafficMaker() {
-		this("http://www.google.com", 5000);
+		this("http://www.google.com", 5000, 0);
 	}
 	
-	public TrafficMaker(String urlstring, long intervalMilliseconds) {
+	public TrafficMaker(String urlstring, long intervalMilliseconds, long aVariance) {
 		try {
 			this.url = new URL(urlstring);
 		} catch (MalformedURLException e) {
@@ -25,6 +30,8 @@ public class TrafficMaker implements Runnable {
 		}
 		this.intervalMilliseconds = intervalMilliseconds;
 		this.logHelper = new LogHelper(urlstring);
+		this.iVariance = aVariance;
+		iRandomNumberGenerator = new Random((new Date()).getTime());
 	}
 
 	public void run() {
@@ -34,7 +41,11 @@ public class TrafficMaker implements Runnable {
 				logHelper.addLog("SEND");
 				bytesRead = wgetPage();
 				logHelper.addLog("RECV | " + bytesRead);
-				Thread.sleep(intervalMilliseconds);
+				int extraDelay = iRandomNumberGenerator.nextInt((int) iVariance/2);
+				if( iRandomNumberGenerator.nextBoolean() == false )
+					extraDelay *= -1;
+				
+				Thread.sleep(intervalMilliseconds+extraDelay);
 			} catch (Exception e) {
 				//TODO
 			}

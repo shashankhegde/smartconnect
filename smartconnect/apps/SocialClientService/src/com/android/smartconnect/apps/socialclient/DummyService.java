@@ -10,7 +10,7 @@ public class DummyService extends Service {
 
 	private static final String TAG = "DUMMY SERVICE";
 	
-	Thread t1, t2, t3;
+	Thread t1, t2, t3, t4;
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -32,6 +32,7 @@ public class DummyService extends Service {
 		t1.stop();
 		t2.stop();
 		t3.stop();
+		t4.stop();
 	}
 	
 	@Override
@@ -41,12 +42,14 @@ public class DummyService extends Service {
 	
 		/* Start Traffic in a separate thread */
 		//(new Thread(new TrafficMaker())).start();
-		t1 = new Thread(new TrafficMaker("http://www.google.com", 20000));
-		t2 = new Thread(new TrafficMaker("http://www.cs.ucsb.edu/~kevinfrancis", 5000));
-		t3 = new Thread(new TrafficMaker("http://www.yahoo.com", 10000));
+		t1 = new Thread(new TrafficMaker("http://www.google.com", 120000, 10000));	// every 2 min, variance = 10 secs
+		t2 = new Thread(new TrafficMaker("http://www.cs.ucsb.edu/", 300000, 30000)); // every 5 min, variance = 30 secs
+		t3 = new Thread(new TrafficMaker("http://www.nytimes.com", 300000, 10000));	// every 5 min, variance = 10 secs
+		t4 = new Thread(new TrafficMaker("http://www.reddit.com/.rss", 900000, 60000));	// every 15 min, variance = 60 secs
 		
 		t1.start();
 		t2.start();
 		t3.start();
+		t4.start();
 	}
 }
