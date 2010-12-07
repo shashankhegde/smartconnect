@@ -12,18 +12,6 @@
 			android:padding="22dp" android:gravity="center" android:layout_width="fill_parent"
 			android:textColor="#FF5500" android:layout_gravity="center"
 			android:textStyle="bold" />
-		<View android:layout_height="2px" android:background="#777777"></View>
-		<TableLayout android:layout_width="fill_parent">
-			<TextView android:textSize="17dp" android:text="Account Information"
-				android:textColor="#999999" android:gravity="center"
-				android:layout_width="fill_parent" android:layout_height="wrap_content" />
-		</TableLayout>
-		<TableRow>
-			<TextView android:textSize="17dp" android:text="Name  " />
-			<TextView android:text="@+id/TextView_name" android:id="@+id/TextView_name"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:textSize="17dp"></TextView>
-		</TableRow>
 		<View android:layout_height="2px" android:background="#ffffff"></View>
 		<TableLayout android:layout_width="fill_parent"
 			android:layout_gravity="center">
@@ -59,10 +47,10 @@
 			<TableRow>
 				<TextView android:text="Http://" android:textSize="17dp"
 					android:layout_weight="1" />
-				<EditText android:id="@+id/EditText_dpt"
+				<EditText android:id="@+id/EditText_url"
 					android:layout_width="wrap_content" android:layout_height="50sp"
 					android:hint="Input Address Here" android:layout_weight="8"></EditText>
-				<Button android:id="@+id/ButtonPick1" android:text="Pick"
+				<Button android:id="@+id/ButtonTest" android:text="TEST"
 					android:layout_weight="1"></Button>
 
 			</TableRow>
@@ -73,28 +61,6 @@
 					android:textColor="#FFFFFF" android:gravity="center"
 					android:layout_width="fill_parent" android:layout_height="wrap_content" />
 			</TableLayout>
-			<TableRow>
-				<TextView android:layout_width="wrap_content"
-					android:layout_height="wrap_content" android:text="Date"
-					android:textSize="17dp" android:layout_weight="1" />
-				<EditText android:id="@+id/EditText_date"
-					android:layout_width="wrap_content" android:layout_height="50sp"
-					android:hint="Click Date Button" android:layout_weight="8"></EditText>
-				<Button android:id="@+id/ButtonDate" android:layout_width="wrap_content"
-					android:layout_height="wrap_content" android:text="Date"
-					android:layout_weight="1"></Button>
-			</TableRow>
-			<TableRow>
-				<TextView android:layout_width="wrap_content"
-					android:layout_height="wrap_content" android:text="Time"
-					android:textSize="17dp" android:layout_weight="1" />
-				<EditText android:id="@+id/EditText_time"
-					android:layout_width="wrap_content" android:layout_height="50sp"
-					android:hint="Click Time Button" android:layout_weight="8"></EditText>
-				<Button android:id="@+id/ButtonTime" android:layout_width="wrap_content"
-					android:layout_height="wrap_content" android:text="Time"
-					android:layout_weight="1"></Button>
-			</TableRow>
 		</TableLayout>
 		<TableLayout>
 			<TableRow>
@@ -108,16 +74,24 @@
 			</TableRow>
 		</TableLayout>
 		<TableLayout>
-			<TextView android:id="@+id/sayHello" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="@string/hello" />
-			<TextView android:id="@+id/sayHelloByName"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:text="@string/hello" />
-			<TextView android:id="@+id/callBack" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="Waiting for service msg" />
-			<Button android:id="@+id/stop" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:text="stop Activity">
-			</Button>
+			<TableRow>
+				<Button android:id="@+id/bind" android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:text="@string/bind_service">
+				</Button>
+				<Button android:id="@+id/unbind" android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:text="@string/unbind_service">
+				</Button>
+				<Button android:id="@+id/kill" android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:text="@string/kill_process">
+				</Button>
+			</TableRow>
+		</TableLayout>
+		<TableLayout>
+			<TableRow>
+				<TextView android:id="@+id/callback" android:layout_width="fill_parent"
+					android:layout_height="wrap_content" android:layout_weight="0"
+					android:gravity="center_horizontal" android:paddingTop="4dip" />
+			</TableRow>
 		</TableLayout>
 		<TableLayout>
 			<TableRow>

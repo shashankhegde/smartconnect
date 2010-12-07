@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.android.perf;
 
 import android.app.Activity;
@@ -11,24 +27,18 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Process;
 import android.os.RemoteException;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.perf.service.IRemoteService;
 import com.android.perf.service.IRemoteServiceCallback;
 import com.android.perf.service.ISecondary;
-import com.android.perf.service.RemoteInterface;
 
-public class Main extends Activity implements OnClickListener {
-	
+
+public class RemoteServiceBinding extends Activity {
     /** The primary interface we will be calling on the service. */
     IRemoteService mService = null;
     /** Another interface we use on the service. */
@@ -37,70 +47,34 @@ public class Main extends Activity implements OnClickListener {
     Button mKillButton;
     TextView mCallbackText;
 
-    private boolean mIsBound = false;
-	
-	private static final String TAG = "SmartConnect Request";
-//	private static boolean serviceRunning = false;
-	Button startButton, stopButton;	
-	Button ButtonTest, ButtonPick2, ButtonSubmit;
-	Button stop = null;
-	Button buttonBind, buttonUnbind;
-	RadioButton RadioButton01, RadioButton02;
-	private EditText EditText_url;
-	static TextView tv01=null;
-	static TextView tv02=null;
-	static TextView callBack=null;
-	
-	String url = "www.google.com";
-	static RemoteInterface mRemoteInterfaceService = null;
-//	private Handler mHandler = null;
-	
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.mainpage);
-		
+    private boolean mIsBound;
+
+    /**
+     * Standard initialization of this activity.  Set up the UI, then wait
+     * for the user to poke it before doing anything.
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.remote_service_binding);
+
         // Watch for button clicks.
-        buttonBind = (Button)findViewById(R.id.bind);
-        buttonBind.setOnClickListener(mBindListener);
-        buttonUnbind = (Button)findViewById(R.id.unbind);
-        buttonUnbind.setOnClickListener(mUnbindListener);
+        Button button = (Button)findViewById(R.id.bind);
+        button.setOnClickListener(mBindListener);
+        button = (Button)findViewById(R.id.unbind);
+        button.setOnClickListener(mUnbindListener);
         mKillButton = (Button)findViewById(R.id.kill);
         mKillButton.setOnClickListener(mKillListener);
         mKillButton.setEnabled(false);
         
         mCallbackText = (TextView)findViewById(R.id.callback);
         mCallbackText.setText("Not attached.");
+    }
 
-        // OLD
-		// UI Constructor -- I now have all my UI in the Java memory
-		ButtonTest = (Button) findViewById(R.id.ButtonTest);
-		RadioButton01 = (RadioButton) findViewById(R.id.RadioButton01);
-		RadioButton02 = (RadioButton) findViewById(R.id.RadioButton02);
-		ButtonSubmit = (Button) findViewById(R.id.ButtonSubmit);
-				
-		EditText_url = (EditText) findViewById(R.id.EditText_url);			
-		
-		EditText_url.setOnKeyListener(new OnKeyListener() {
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				if ((event.getAction() == KeyEvent.ACTION_DOWN)
-						&& (keyCode == KeyEvent.KEYCODE_ENTER)) {
-						url = EditText_url.getText().toString();
-						EditText_url.setText(url);
-						
-					return true;
-				}
-				return false;
-			}
-		});
-		
-//		ComponentName cn = this.startService(new Intent("com.android.perf.service.RemoteInterface"));
-//		startBindService();
-
-		// Define button listeners
-		ButtonTest.setOnClickListener(this);
-		ButtonSubmit.setOnClickListener(this);		
-	}
-	
+    /**
+     * Class for interacting with the main interface of the service.
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
@@ -111,7 +85,7 @@ public class Main extends Activity implements OnClickListener {
             // representation of that from the raw service object.
             mService = IRemoteService.Stub.asInterface(service);
             mKillButton.setEnabled(true);
-            mCallbackText.setText("Attached...");
+            mCallbackText.setText("Attached.");
 
             // We want to monitor the service for as long as we are
             // connected to it.
@@ -125,7 +99,7 @@ public class Main extends Activity implements OnClickListener {
             }
             
             // As part of the sample, tell the user what happened.
-            Toast.makeText(Main.this, R.string.remote_service_connected,
+            Toast.makeText(RemoteServiceBinding.this, R.string.remote_service_connected,
                     Toast.LENGTH_SHORT).show();
         }
 
@@ -137,11 +111,14 @@ public class Main extends Activity implements OnClickListener {
             mCallbackText.setText("Disconnected.");
 
             // As part of the sample, tell the user what happened.
-            Toast.makeText(Main.this, R.string.remote_service_disconnected,
+            Toast.makeText(RemoteServiceBinding.this, R.string.remote_service_disconnected,
                     Toast.LENGTH_SHORT).show();
         }
     };
-    
+
+    /**
+     * Class for interacting with the secondary interface of the service.
+     */
     private ServiceConnection mSecondaryConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
@@ -168,7 +145,7 @@ public class Main extends Activity implements OnClickListener {
             bindService(new Intent(ISecondary.class.getName()),
                     mSecondaryConnection, Context.BIND_AUTO_CREATE);
             mIsBound = true;
-            mCallbackText.setText("Binding...");
+            mCallbackText.setText("Binding.");
         }
     };
 
@@ -191,7 +168,7 @@ public class Main extends Activity implements OnClickListener {
                 unbindService(mSecondaryConnection);
                 mKillButton.setEnabled(false);
                 mIsBound = false;
-                mCallbackText.setText("Unbinding...");
+                mCallbackText.setText("Unbinding.");
             }
         }
     };
@@ -216,15 +193,24 @@ public class Main extends Activity implements OnClickListener {
                     mCallbackText.setText("Killed service process.");
                 } catch (RemoteException ex) {
                     // Recover gracefully from the process hosting the
-					// server dying.
-					// Just for purposes of the sample, put up a notification.
-					Toast.makeText(Main.this, R.string.remote_call_failed,
-							Toast.LENGTH_SHORT).show();
+                    // server dying.
+                    // Just for purposes of the sample, put up a notification.
+                    Toast.makeText(RemoteServiceBinding.this,
+                            R.string.remote_call_failed,
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         }
     };
     
+    // ----------------------------------------------------------------------
+    // Code showing how to deal with callbacks.
+    // ----------------------------------------------------------------------
+    
+    /**
+     * This implementation is used to receive callbacks from the remote
+     * service.
+     */
     private IRemoteServiceCallback mCallback = new IRemoteServiceCallback.Stub() {
         /**
          * This is called by the remote service regularly to tell us about
@@ -236,6 +222,7 @@ public class Main extends Activity implements OnClickListener {
         public void valueChanged(int value) {
             mHandler.sendMessage(mHandler.obtainMessage(BUMP_MSG, value, 0));
         }
+
     };
     
     private static final int BUMP_MSG = 1;
@@ -252,23 +239,6 @@ public class Main extends Activity implements OnClickListener {
         }
         
     };
-	
-	@Override
-	public void onClick(View src) {
-		switch (src.getId()) {
-		case R.id.ButtonTest:
-//			if (!serviceRunning) {
-//				serviceRunning = true;
-			Intent intent = new Intent(this, DummyService.class);
-			Log.d(TAG, "onClick: Starting Service");
-			startService(intent);
-			break;
-//			}
-			
-		case R.id.ButtonSubmit:
-			Intent intent5 = new Intent(this, WebFacebook.class);
-			startActivity(intent5);
-			break;
-		}
-	}
 }
+
+
