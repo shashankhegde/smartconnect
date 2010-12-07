@@ -1,9 +1,11 @@
 package com.android.smartconnect.requestmanager;
 
-import java.util.PriorityQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 
-public class RequestQueue extends PriorityQueue<UrlRequest> {
-	
-	
 
+public class RequestQueue extends ArrayBlockingQueue<UrlRequest> {
+
+	public RequestQueue(int capacity) {
+		super(capacity);
+	}
 }

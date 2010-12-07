@@ -10,20 +10,15 @@ import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.util.Log;
 
-public class RequestProcessor extends AsyncTask<Integer, Integer, Integer> {
+public class RequestProcessor extends AsyncTask<UrlRequest, Integer, Integer> {
 
-	private RequestQueue iRequestQueue = null;
 	private URLConnection iUrlConnection;
 	
-	RequestProcessor(RequestQueue aRequestQueue) {
-		iRequestQueue = aRequestQueue;
-	}
-	
 	@Override
-	protected Integer doInBackground(Integer... params) {
+	protected Integer doInBackground(UrlRequest... params) {
 		
-		while(iRequestQueue.size() != 0) {
-			UrlRequest req = iRequestQueue.remove();
+			Log.i("RequestProcessor", "doInBackground() " + params[0].iUrl.toString());
+			UrlRequest req = params[0];
 			String data = GetData(req.iUrl);
 			if(req.iCallback != null) {
 				try {
@@ -33,8 +28,8 @@ public class RequestProcessor extends AsyncTask<Integer, Integer, Integer> {
 					e.printStackTrace();
 				}
 			}
-		}
-		return null;
+			this.notify();
+			return null;
 	}
 
 	private String GetData(URL aUrl) {
