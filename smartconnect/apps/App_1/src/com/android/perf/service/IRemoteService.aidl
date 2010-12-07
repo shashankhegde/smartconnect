@@ -4,7 +4,7 @@ import com.android.perf.service.IRemoteServiceCallback;
 
 interface IRemoteService {
 
-    void registerCallback(IRemoteServiceCallback cb);
-    void unregisterCallback(IRemoteServiceCallback cb);
+    boolean registerCallback(IRemoteServiceCallback cb);
+    boolean unregisterCallback(IRemoteServiceCallback cb);
     String onService(int msg);
 }

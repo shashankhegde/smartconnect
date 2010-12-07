@@ -88,9 +88,26 @@
 		</TableLayout>
 		<TableLayout>
 			<TableRow>
+				<TextView android:id="@+id/callbackText" android:layout_width="fill_parent"
+					android:layout_height="wrap_content" android:layout_weight="0"
+					android:gravity="center_horizontal" android:paddingTop="4dip" />
+			</TableRow>
+		</TableLayout>
+					<View android:layout_height="2px" android:background="#ffffff"></View>
+		<TableLayout>
+			<TableRow>
+							<TextView android:id="@+id/tv01" android:layout_width="fill_parent"
+					android:layout_height="wrap_content" android:layout_weight="0"
+					android:gravity="center_horizontal" android:paddingTop="4dip" />
+									<TextView android:id="@+id/tv02" android:layout_width="fill_parent"
+					android:layout_height="wrap_content" android:layout_weight="0"
+					android:gravity="center_horizontal" android:paddingTop="4dip" />
 				<TextView android:id="@+id/callback" android:layout_width="fill_parent"
 					android:layout_height="wrap_content" android:layout_weight="0"
 					android:gravity="center_horizontal" android:paddingTop="4dip" />
+									<Button android:id="@+id/stop" android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:text="Stop">
+				</Button>
 			</TableRow>
 		</TableLayout>
 		<TableLayout>
