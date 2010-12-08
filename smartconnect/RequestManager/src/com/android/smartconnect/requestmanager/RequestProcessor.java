@@ -14,6 +14,10 @@ public class RequestProcessor extends AsyncTask<UrlRequest, Integer, Integer> {
 
 	private URLConnection iUrlConnection;
 	
+	public RequestProcessor () {
+		super();
+	}
+	
 	@Override
 	protected Integer doInBackground(UrlRequest... params) {
 		
