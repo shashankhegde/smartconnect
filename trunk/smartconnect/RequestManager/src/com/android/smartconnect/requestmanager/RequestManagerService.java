@@ -1,5 +1,8 @@
 package com.android.smartconnect.requestmanager;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,11 +25,11 @@ public class RequestManagerService extends Service {
 	private IRequestManager.Stub iRequestManager = null;
 	private RequestQueue iRequestQueue = null;
 	private Timer iTimer = null;
-	private RequestTimerTask iTimerTask = null;
+	//private RequestTimerTask iTimerTask = null;
 	private RequestProcessor iRequestProcessor = null;
 	
 	private int iInterval = 2*60*1000; 	// 2 min in ms
-	
+/*	
 	private Handler iTimerScheduler = new Handler() {
 		
 		public void handleMessage(Message msg) {
@@ -41,7 +44,7 @@ public class RequestManagerService extends Service {
 		}
 		
 	};
-	
+*/
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -52,6 +55,7 @@ public class RequestManagerService extends Service {
 		if(iRequestManager == null) {
 			iRequestManager = new IRequestManagerStubImpl();
 		}
+		(new Thread(new RequestQueueTimeManager())).start();
 	}
 	
 	private class IRequestManagerStubImpl extends IRequestManager.Stub {
@@ -72,16 +76,19 @@ public class RequestManagerService extends Service {
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				Log.i("REQ MANAGER SERVICE", "Malformed URL Exception");
 			}
 			newUrlRequest.iCallback = aCallback;
+			
+			Log.i("REQ MANAGER SERVICE", "Will add url to request queue");
 			iRequestQueue.add(newUrlRequest);
-			iTimerScheduler.sendEmptyMessage(SCHEDULE_TIMER_TASK);
+			//iTimerScheduler.sendEmptyMessage(SCHEDULE_TIMER_TASK);
 			
 			return 0;
 		}
 
 	}
-	
+/*	
 	private class RequestTimerTask extends TimerTask {
 
 		public RequestTimerTask() {
@@ -90,28 +97,185 @@ public class RequestManagerService extends Service {
 		
 		@Override
 		public void run() {
+
 			Log.i("RequestManagerService","run()");
 			
+	
 			List<RequestProcessor> iRequestProcessors = new ArrayList<RequestProcessor>();
 			
 			int size = iRequestQueue.size();
-			for( int i=0; i<iRequestQueue.size(); i++) {
+			for( int i=0; i<size; i++) {
 				iRequestProcessors.add(new RequestProcessor());
 				UrlRequest req = iRequestQueue.remove();
 				iRequestProcessors.get(i).doInBackground(req);
+			}
+			
+			for(int i=0; i<size; i++) {
 				try {
 					iRequestProcessors.get(i).wait();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
 			}
 			
 			// all requests completed!
 			iTimerScheduler.sendEmptyMessage(SCHEDULE_TIMER_TASK);
 
 		}
+
+	}
+*/	
+	// Request queue time manager:  Flushes the queue at regular intervals
+	private class RequestQueueTimeManager implements Runnable {
+		
+		private Thread t = null;
+		@Override
+		public void run() {
+			while (true) {
+				Log.i("REQUEST MANAGER", "Flushing requests");
+				FlushRequests();
+				try {
+					Log.i("REQUEST MANAGER", "SLEEPING");
+					Thread.sleep(iInterval);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+/*				try {
+					if (t != null)
+						t.stop();
+
+					t = new Thread(new RequestQueueFlusher());
+					t.start();
+					Thread.sleep(iInterval);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+*/			}
+		}
+	}
+
+	private void FlushRequests() {
+		
+		if (iRequestQueue == null) {
+			Log.i("REQUeST MANAGER", "iRequestQueue is null. RETURNING");
+			return;
+		}
+
+		int size = iRequestQueue.size();
+		int i;
+		
+		for (i=0; i<size; i++) {
+			UrlRequest req = iRequestQueue.remove();
+			RequestExecutor rexec = new RequestExecutor(req);
+			(new Thread(rexec)).start();
+		}
+		/*
+		List<RequestProcessor> iRequestProcessors = new ArrayList<RequestProcessor>();
+		int size = iRequestQueue.size();
+		for( int i=0; i<size; i++) {
+			iRequestProcessors.add(new RequestProcessor());
+			UrlRequest req = iRequestQueue.remove();
+			iRequestProcessors.get(i).doInBackground(req);
+		}
+		
+		for(int i=0; i<size; i++) {
+			try {
+				iRequestProcessors.get(i).wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		*/
 		
 	}
+	
+	private class RequestExecutor implements Runnable {
+		
+		URL url;
+		RequestCallback callBackFunc;
+		
+		public RequestExecutor(UrlRequest requestObject) {
+			this.url = requestObject.iUrl;
+			this.callBackFunc = requestObject.iCallback;
+		}
+		
+		@Override
+		public void run() {
+			String urlData;
+			try {
+				urlData = wgetPage();
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
+			Log.i("INFO", "Data received " + urlData.length());
+			/*  Try again later !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			if(callBackFunc != null) {
+				try {
+					callBackFunc.onDataReceived(urlData);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			*/
+			LogHelper logHelper = new LogHelper(url.toExternalForm());
+			logHelper.addLog("RECV | " + urlData.length());
+		}
+		
+		private String wgetPage() throws MalformedURLException, IOException {
+			
+			String urlData = "";
+			String inputLine;
+			
+			BufferedReader in = new BufferedReader(
+						new InputStreamReader(
+						url.openStream()));
+
+			while ((inputLine = in.readLine()) != null)
+				urlData += inputLine + '\n';
+			
+			in.close();
+			
+			return urlData;
+		}
+	}
+	/*
+	// Request Queue Flusher: To flush the queue
+	private class RequestQueueFlusher implements Runnable {
+		public void run() {
+			// Flush Request Queue
+			List<RequestProcessor> iRequestProcessors = new ArrayList<RequestProcessor>();
+			
+			int size = iRequestQueue.size();
+			for( int i=0; i<size; i++) {
+				iRequestProcessors.add(new RequestProcessor());
+				UrlRequest req = iRequestQueue.remove();
+				iRequestProcessors.get(i).doInBackground(req);
+			}
+			
+			for(int i=0; i<size; i++) {
+				try {
+					iRequestProcessors.get(i).wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		}
+	}
+	*/
 
 }
