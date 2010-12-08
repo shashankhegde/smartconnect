@@ -12,6 +12,7 @@ import java.util.Random;
 
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.android.smartconnect.requestmanager.IRequestManager;
 import com.android.smartconnect.requestmanager.RequestCallback;
@@ -26,8 +27,11 @@ public class TrafficMaker implements Runnable {
 	private long iVariance;
 	private Random iRandomNumberGenerator;
 	
+	private long iRequestCount;
+	
 	public TrafficMaker(IRequestManager service) {
 		this("http://www.google.com", 5000, 0,service);
+		iRequestCount = 0;
 	}
 	
 	public TrafficMaker(String urlstring, long intervalMilliseconds, long aVariance, IRequestManager service) {
@@ -58,8 +62,14 @@ public class TrafficMaker implements Runnable {
 */
 	RequestCallback iIncomingHandler = new RequestCallback.Stub() {
 		
-		public void onDataReceived(String arg0) throws RemoteException {
+/*		public void onDataReceived(String arg0) throws RemoteException {
 			logHelper.addLog("RECV | " + arg0.length() + ";");
+		}
+*/
+		public void onDataReceived(long aRequestId, String aData)
+				throws RemoteException {
+			logHelper.addLog("RECV | " + aRequestId + " " + aData.length() + ";");
+			Log.i("TrafficMaker", "RECV | " + aRequestId + " " + aData.length() + ";");
 		}
 	};
 	
@@ -72,12 +82,16 @@ public class TrafficMaker implements Runnable {
 		int bytesRead = 0;
 		while (true) {
 			try {
+				iRequestCount++;
 				String strUrl = url.toExternalForm();
-				logHelper.addLog("SEND");
-				//bytesRead = wgetPage();
-				//logHelper.addLog("RECV | " + bytesRead);
+				logHelper.addLog("SEND " + String.valueOf(iRequestCount));
+				Log.i("TrafficMaker","SEND " + String.valueOf(iRequestCount));
+				
+				bytesRead = wgetPage();
+				logHelper.addLog("RECV | " + iRequestCount + " " + bytesRead + ";");
+				Log.i("TrafficMaker", "RECV | " + iRequestCount + " " + bytesRead + ";");
 
-				reqManagerService.GetData(strUrl, iIncomingHandler);
+				//reqManagerService.GetData(strUrl, iRequestCount, iIncomingHandler);
 
 				int extraDelay = iRandomNumberGenerator.nextInt((int) iVariance/2);
 				if( iRandomNumberGenerator.nextBoolean() == false )
