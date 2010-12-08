@@ -45,9 +45,11 @@ return true;
 case TRANSACTION_onDataReceived:
 {
 data.enforceInterface(DESCRIPTOR);
-java.lang.String _arg0;
-_arg0 = data.readString();
-this.onDataReceived(_arg0);
+long _arg0;
+_arg0 = data.readLong();
+java.lang.String _arg1;
+_arg1 = data.readString();
+this.onDataReceived(_arg0, _arg1);
 return true;
 }
 }
@@ -68,11 +70,12 @@ public java.lang.String getInterfaceDescriptor()
 {
 return DESCRIPTOR;
 }
-public void onDataReceived(java.lang.String aData) throws android.os.RemoteException
+public void onDataReceived(long aRequestId, java.lang.String aData) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 try {
 _data.writeInterfaceToken(DESCRIPTOR);
+_data.writeLong(aRequestId);
 _data.writeString(aData);
 mRemote.transact(Stub.TRANSACTION_onDataReceived, _data, null, android.os.IBinder.FLAG_ONEWAY);
 }
@@ -83,5 +86,5 @@ _data.recycle();
 }
 static final int TRANSACTION_onDataReceived = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
 }
-public void onDataReceived(java.lang.String aData) throws android.os.RemoteException;
+public void onDataReceived(long aRequestId, java.lang.String aData) throws android.os.RemoteException;
 }

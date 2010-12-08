@@ -4,5 +4,5 @@ import com.android.smartconnect.requestmanager.RequestCallback;
 
 interface IRequestManager {
 
-    int GetData(String aUrl, RequestCallback aCallback);
+    int GetData(String aUrl, long aRequestId, RequestCallback aCallback);
 }

@@ -47,9 +47,11 @@ case TRANSACTION_GetData:
 data.enforceInterface(DESCRIPTOR);
 java.lang.String _arg0;
 _arg0 = data.readString();
-com.android.smartconnect.requestmanager.RequestCallback _arg1;
-_arg1 = com.android.smartconnect.requestmanager.RequestCallback.Stub.asInterface(data.readStrongBinder());
-int _result = this.GetData(_arg0, _arg1);
+long _arg1;
+_arg1 = data.readLong();
+com.android.smartconnect.requestmanager.RequestCallback _arg2;
+_arg2 = com.android.smartconnect.requestmanager.RequestCallback.Stub.asInterface(data.readStrongBinder());
+int _result = this.GetData(_arg0, _arg1, _arg2);
 reply.writeNoException();
 reply.writeInt(_result);
 return true;
@@ -72,7 +74,7 @@ public java.lang.String getInterfaceDescriptor()
 {
 return DESCRIPTOR;
 }
-public int GetData(java.lang.String aUrl, com.android.smartconnect.requestmanager.RequestCallback aCallback) throws android.os.RemoteException
+public int GetData(java.lang.String aUrl, long aRequestId, com.android.smartconnect.requestmanager.RequestCallback aCallback) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
@@ -80,6 +82,7 @@ int _result;
 try {
 _data.writeInterfaceToken(DESCRIPTOR);
 _data.writeString(aUrl);
+_data.writeLong(aRequestId);
 _data.writeStrongBinder((((aCallback!=null))?(aCallback.asBinder()):(null)));
 mRemote.transact(Stub.TRANSACTION_GetData, _data, _reply, 0);
 _reply.readException();
@@ -94,5 +97,5 @@ return _result;
 }
 static final int TRANSACTION_GetData = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
 }
-public int GetData(java.lang.String aUrl, com.android.smartconnect.requestmanager.RequestCallback aCallback) throws android.os.RemoteException;
+public int GetData(java.lang.String aUrl, long aRequestId, com.android.smartconnect.requestmanager.RequestCallback aCallback) throws android.os.RemoteException;
 }

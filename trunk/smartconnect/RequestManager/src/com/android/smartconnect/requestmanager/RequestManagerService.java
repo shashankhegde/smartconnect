@@ -28,7 +28,9 @@ public class RequestManagerService extends Service {
 	//private RequestTimerTask iTimerTask = null;
 	private RequestProcessor iRequestProcessor = null;
 	
-	private int iInterval = 2*60*1000; 	// 2 min in ms
+	private int iInterval = 5*60*1000; 	// 5 min in ms
+	
+	private LogHelper iLogger = null;
 /*	
 	private Handler iTimerScheduler = new Handler() {
 		
@@ -55,13 +57,16 @@ public class RequestManagerService extends Service {
 		if(iRequestManager == null) {
 			iRequestManager = new IRequestManagerStubImpl();
 		}
+		
+		iLogger = new LogHelper("RequestManager.log");
+		
 		(new Thread(new RequestQueueTimeManager())).start();
 	}
 	
 	private class IRequestManagerStubImpl extends IRequestManager.Stub {
 
 		@Override
-		public int GetData(String aUrl, RequestCallback aCallback)
+		public int GetData(String aUrl, long aRequestId, RequestCallback aCallback)
 				throws RemoteException {
 
 			Log.i("IRequestManagerStubImpl","GetData() " + aUrl);
@@ -69,10 +74,14 @@ public class RequestManagerService extends Service {
 			if(iRequestQueue == null) {
 				iRequestQueue = new RequestQueue(MAX_REQUESTS);
 			}
+
 			
 			UrlRequest newUrlRequest = new UrlRequest();
 			try {
 				newUrlRequest.iUrl = new URL(aUrl);
+				newUrlRequest.iCallback = aCallback;
+				newUrlRequest.iRequestId = aRequestId;
+				
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -82,7 +91,8 @@ public class RequestManagerService extends Service {
 			
 			Log.i("REQ MANAGER SERVICE", "Will add url to request queue");
 			iRequestQueue.add(newUrlRequest);
-			//iTimerScheduler.sendEmptyMessage(SCHEDULE_TIMER_TASK);
+
+			iLogger.addLog(iRequestQueue.size() + " REQ " + aUrl + aRequestId);
 			
 			return 0;
 		}
@@ -161,11 +171,12 @@ public class RequestManagerService extends Service {
 	private void FlushRequests() {
 		
 		if (iRequestQueue == null) {
-			Log.i("REQUeST MANAGER", "iRequestQueue is null. RETURNING");
+			Log.i("REQUEST MANAGER", "iRequestQueue is null. RETURNING");
 			return;
 		}
 
 		int size = iRequestQueue.size();
+		iLogger.addLog("Flushing Requests " + size);
 		int i;
 		
 		for (i=0; i<size; i++) {
@@ -199,15 +210,19 @@ public class RequestManagerService extends Service {
 		
 		URL url;
 		RequestCallback callBackFunc;
+		long iRequestId;
 		
 		public RequestExecutor(UrlRequest requestObject) {
 			this.url = requestObject.iUrl;
 			this.callBackFunc = requestObject.iCallback;
+			this.iRequestId = requestObject.iRequestId;
 		}
 		
 		@Override
 		public void run() {
 			String urlData;
+			Log.i("REQUEST MANAGER", "Requesting Data " + url.toString() + " " + iRequestId);
+
 			try {
 				urlData = wgetPage();
 			} catch (MalformedURLException e) {
@@ -219,20 +234,21 @@ public class RequestManagerService extends Service {
 				e.printStackTrace();
 				return;
 			}
-			Log.i("INFO", "Data received " + urlData.length());
-			/*  Try again later !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			if(callBackFunc != null) {
+			
+			Log.i("REQUEST MANAGER", "Data received " + urlData.length());
+
+			if(true) {
 				try {
-					callBackFunc.onDataReceived(urlData);
+					callBackFunc.onDataReceived(iRequestId,urlData);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			*/
-			LogHelper logHelper = new LogHelper(url.toExternalForm());
+
+/*			LogHelper logHelper = new LogHelper(url.toExternalForm());
 			logHelper.addLog("RECV | " + urlData.length());
-		}
+*/		}
 		
 		private String wgetPage() throws MalformedURLException, IOException {
 			
