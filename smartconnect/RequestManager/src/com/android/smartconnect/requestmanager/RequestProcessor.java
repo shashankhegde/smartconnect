@@ -26,7 +26,7 @@ public class RequestProcessor extends AsyncTask<UrlRequest, Integer, Integer> {
 			String data = GetData(req.iUrl);
 			if(req.iCallback != null) {
 				try {
-					req.iCallback.onDataReceived(req.iRequestId,data);
+					req.iCallback.onDataReceived(req.iRequestId,data.length());
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
