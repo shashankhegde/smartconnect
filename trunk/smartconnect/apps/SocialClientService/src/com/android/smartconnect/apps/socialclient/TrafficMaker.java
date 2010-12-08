@@ -43,7 +43,7 @@ public class TrafficMaker implements Runnable {
 		iRandomNumberGenerator = new Random((new Date()).getTime());
 	}
 	
-	class IncomingHandler implements RequestCallback {// TODO Auto-generated method stub
+/*	class IncomingHandler implements RequestCallback {// TODO Auto-generated method stub
 
 		public void onDataReceived(String arg0) throws RemoteException {
 			logHelper.addLog("RECV | " + arg0.length() + ";");
@@ -55,11 +55,20 @@ public class TrafficMaker implements Runnable {
 		}
 	    
 	}
-
-	IncomingHandler iIncomingHandler = new IncomingHandler();
+*/
+	RequestCallback iIncomingHandler = new RequestCallback.Stub() {
+		
+		public void onDataReceived(String arg0) throws RemoteException {
+			logHelper.addLog("RECV | " + arg0.length() + ";");
+		}
+	};
 	
 	public void run() {
 		
+/*		if(iIncomingHandler == null) {
+			iIncomingHandler = new IncomingHandler();
+		}
+*/		
 		int bytesRead = 0;
 		while (true) {
 			try {
