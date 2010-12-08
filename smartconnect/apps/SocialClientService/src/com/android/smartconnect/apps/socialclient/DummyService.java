@@ -18,7 +18,7 @@ public class DummyService extends Service {
 	private IRequestManager reqManagerService;
 	private boolean connectedToReqManager = false;
 	
-	Thread t1, t2, t3, t4, t5;
+	Thread t1, t2, t3, t4, t5, t6;
 	
 	ServiceConnection conn = new ServiceConnection() {
 		public void onServiceConnected(ComponentName name, IBinder boundService) {
@@ -74,6 +74,7 @@ public class DummyService extends Service {
 		t3.stop();
 		t4.stop();
 		t5.stop();
+		t6.stop();
 	}
 	
 	@Override
@@ -106,10 +107,11 @@ public class DummyService extends Service {
 			}
 				
 			t1 = new Thread(new TrafficMaker("http://www.google.com", 120000, 10000,reqManagerService));	// every 2 min, variance = 10 secs
-			t2 = new Thread(new TrafficMaker("http://www.cs.ucsb.edu/", 300000, 30000,reqManagerService)); // every 5 min, variance = 30 secs
-			t3 = new Thread(new TrafficMaker("http://www.nytimes.com", 300000, 10000,reqManagerService));	// every 5 min, variance = 10 secs
+			t2 = new Thread(new TrafficMaker("http://www.cs.ucsb.edu/", 300000, 30000,reqManagerService)); // every 3 min, variance = 30 secs
+			t3 = new Thread(new TrafficMaker("http://feeds.feedburner.com/TechCrunch", 300000, 10000,reqManagerService));	// every 4 min, variance = 10 secs
 			t4 = new Thread(new TrafficMaker("http://www.reddit.com/.rss", 900000, 60000,reqManagerService));	// every 15 min, variance = 60 secs
-			t5 = new Thread(new TrafficMaker("http://rss.slashdot.org/Slashdot/slashdot", 1800000, 60000,reqManagerService));	// every 30 min, variance = 60 secs
+			t5 = new Thread(new TrafficMaker("http://rss.slashdot.org/Slashdot/slashdot", 1800000, 120000,reqManagerService));	// every 20 min, variance = 60 secs
+			t6 = new Thread(new TrafficMaker("http://www.deccanherald.com", 1800000, 60000,reqManagerService));	// every 30 min, variance = 60 secs
 			
 				
 			t1.start();
@@ -117,6 +119,7 @@ public class DummyService extends Service {
 			t3.start();
 			t4.start();
 			t5.start();
+			t6.start();
 		}
 	}
 	

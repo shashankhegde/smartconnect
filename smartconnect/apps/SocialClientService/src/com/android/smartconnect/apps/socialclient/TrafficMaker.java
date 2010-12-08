@@ -66,10 +66,10 @@ public class TrafficMaker implements Runnable {
 			logHelper.addLog("RECV | " + arg0.length() + ";");
 		}
 */
-		public void onDataReceived(long aRequestId, String aData)
+		public void onDataReceived(long aRequestId, int aDataLen)
 				throws RemoteException {
-			logHelper.addLog("RECV | " + aRequestId + " " + aData.length() + ";");
-			Log.i("TrafficMaker", "RECV | " + aRequestId + " " + aData.length() + ";");
+			logHelper.addLog("RECV | " + aRequestId + " " + aDataLen + ";");
+			Log.i("TrafficMaker", "RECV | " + aRequestId + " " + aDataLen + ";");
 		}
 	};
 	
@@ -118,12 +118,15 @@ public class TrafficMaker implements Runnable {
 					new InputStreamReader(
 					url.openStream()));
 
-		while ((inputLine = in.readLine()) != null)
-			urlData += inputLine + '\n';
+		int len = 0;
+		while ((inputLine = in.readLine()) != null) {
+			//urlData += inputLine + '\n';
+			len += inputLine.length();
+		}
 		
 		in.close();
 		
-		return urlData.length();
+		return len; //urlData.length();
 	}
 
 }
