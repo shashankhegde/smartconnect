@@ -12,7 +12,9 @@
             </intent-filter>
         </activity>
         <service android:enabled="true" android:name=".DummyService" />
+        <service android:process=":remote" android:name="com.android.smartconnect.requestmanager.RequestManagerService"></service>
     </application>
+
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
 </manifest> 
