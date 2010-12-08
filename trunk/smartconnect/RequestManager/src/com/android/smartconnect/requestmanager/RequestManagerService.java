@@ -181,6 +181,7 @@ public class RequestManagerService extends Service {
 		
 		for (i=0; i<size; i++) {
 			UrlRequest req = iRequestQueue.remove();
+			iLogger.addLog("FR " + req.iUrl.toString());
 			RequestExecutor rexec = new RequestExecutor(req);
 			(new Thread(rexec)).start();
 		}
@@ -220,11 +221,11 @@ public class RequestManagerService extends Service {
 		
 		@Override
 		public void run() {
-			String urlData;
+			int urlDataLen;
 			Log.i("REQUEST MANAGER", "Requesting Data " + url.toString() + " " + iRequestId);
 
 			try {
-				urlData = wgetPage();
+				urlDataLen = wgetPage();
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -235,11 +236,11 @@ public class RequestManagerService extends Service {
 				return;
 			}
 			
-			Log.i("REQUEST MANAGER", "Data received " + urlData.length());
+			Log.i("REQUEST MANAGER", "Data received " + url.toString() + " : " + urlDataLen);
 
 			if(true) {
 				try {
-					callBackFunc.onDataReceived(iRequestId,urlData);
+					callBackFunc.onDataReceived(iRequestId,urlDataLen);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -250,7 +251,7 @@ public class RequestManagerService extends Service {
 			logHelper.addLog("RECV | " + urlData.length());
 */		}
 		
-		private String wgetPage() throws MalformedURLException, IOException {
+		private int wgetPage() throws MalformedURLException, IOException {
 			
 			String urlData = "";
 			String inputLine;
@@ -259,12 +260,16 @@ public class RequestManagerService extends Service {
 						new InputStreamReader(
 						url.openStream()));
 
-			while ((inputLine = in.readLine()) != null)
-				urlData += inputLine + '\n';
+			int len = 0;
+			
+			while ((inputLine = in.readLine()) != null) {
+				//urlData += inputLine + '\n';
+				len += inputLine.length(); 
+			}
 			
 			in.close();
 			
-			return urlData;
+			return len; //urlData.length();
 		}
 	}
 	/*
